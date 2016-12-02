@@ -78,7 +78,7 @@ namespace Microsoft.Its.Domain
         {
             return await scheduler.Schedule(
                 command: command,
-                targetId: command.TargetId,
+                targetId: command.TargetId ?? command.AggregateId.ToString(),
                 dueTime: dueTime,
                 deliveryDependsOn: deliveryDependsOn,
                 clock: clock);
