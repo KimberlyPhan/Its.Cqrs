@@ -44,7 +44,7 @@ namespace Microsoft.Its.Domain.Sql
             this.dbContext = dbContext;
             this.lockResourceName = lockResourceName;
 
-            if (TryGetAppLock())
+             if (TryGetAppLock())
             {
                 startAtId = getStartAtId();
 
@@ -52,9 +52,10 @@ namespace Microsoft.Its.Domain.Sql
                     applyFilter(dbContext.Events.AsNoTracking())
                         .Where(e => e.Id >= startAtId)
                         .OrderBy(e => e.Id);
-
+                var oldCommandTimeout = dbContext.Database.CommandTimeout;
                 try
                 {
+                    dbContext.Database.CommandTimeout = TimeSpan.FromMinutes(10).Seconds;
                     TotalMatchedEventCount = eventQuery.Count();
                 }
                 catch
@@ -67,6 +68,7 @@ namespace Microsoft.Its.Domain.Sql
                 eventQuery = eventQuery.Take(batchSize);
 
                 events = DurableStreamFrom(eventQuery, startAtId);
+                dbContext.Database.CommandTimeout = oldCommandTimeout;
             }
             else
             {
