@@ -57,12 +57,15 @@ namespace Microsoft.Its.Domain.Sql
                 {
                     dbContext.Database.CommandTimeout = TimeSpan.FromMinutes(10).Seconds;
                     TotalMatchedEventCount = eventQuery.Count();
-                    dbContext.Database.CommandTimeout = oldCommandTimeout;
                 }
                 catch
                 {
                     System.Diagnostics.Trace.WriteLine("Failed :eventQuery.Count() \n" + eventQuery.ToString());
                     throw;
+                }
+                finally
+                {
+                    dbContext.Database.CommandTimeout = oldCommandTimeout;
                 }
                 BatchMatchedEventCount = Math.Min(BatchSize, TotalMatchedEventCount);
 
